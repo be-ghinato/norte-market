@@ -1,0 +1,1 @@
+{"name":"av1-fullstack-2026","private":true,"version":"1.0.0","scripts":{"dev:react":"npm --prefix apps/react run dev","build:react":"npm --prefix apps/react run build","test":"npm --prefix apps/react test","dev:institutional":"npm --prefix apps/institutional run dev","build:institutional":"npm --prefix apps/institutional run build"}}

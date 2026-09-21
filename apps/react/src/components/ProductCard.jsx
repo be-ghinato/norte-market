@@ -1,0 +1,3 @@
+export default function ProductCard({ product, isFavorite, onToggleFavorite }) {
+  return <article className="product-card"><div className="product-card__image"><img src={product.image} alt={product.title}/></div><div className="product-card__body"><span className="product-card__category">{product.category}</span><h3>{product.title}</h3><p>{product.description.slice(0,110)}...</p><div className="product-card__bottom"><strong>R$ {product.price.toFixed(2).replace('.', ',')}</strong><button onClick={()=>onToggleFavorite(product.id)}>{isFavorite?'★ Salvo':'☆ Favoritar'}</button></div></div></article>;
+}
