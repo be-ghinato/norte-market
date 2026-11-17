@@ -53,9 +53,6 @@ const defaultProducts = [
   }
 ];
 
-// Imagem padrão caso a do produto não carregue
-const defaultImage = 'https://placehold.co/400x300?text=Sem+Imagem';
-
 export default function Catalogo({ favorites, onToggleFavorite }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,28 +60,20 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
 
   useEffect(() => {
     let active = true;
-    let hasShownError = false;
-
     getProducts()
       .then((data) => {
-        if (active) {
-          // Se backend trouxe dados reais e tem produtos, usa eles
-          if (data && Array.isArray(data) && data.length > 0) {
-            setProducts(data);
-          } else {
-            // Backend vazia, usa produtos padrão
-            setProducts(defaultProducts);
-            if (!hasShownError) {
-              console.log('Backend sem produtos - usando padrão');
-              hasShownError = true;
-            }
-          }
+        if (active && data && Array.isArray(data) && data.length > 0) {
+          // Se backend trouxe dados reais, usa eles
+          setProducts(data);
+        } else {
+          // Backend vazia ou erro, usa produtos padrão
+          setProducts(defaultProducts);
         }
       })
       .catch((err) => {
         if (active) {
           console.error('Erro ao carregar produtos da API:', err);
-          // Em caso de erro qualquer, usa produtos padrão
+          // Em caso de erro, usa produtos fallback
           setProducts(defaultProducts);
         }
       })
@@ -92,7 +81,7 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
         if (active) setLoading(false);
       });
 
-    // Segurança: se mesmo depois do efeito os products estiverem vazios,
+    // Segurança: se mesmo assim os products estiverem vazios,
     // força o uso dos produtos padrão após um pequeno atraso
     const fallback = setTimeout(() => {
       if (active && products.length === 0) {
@@ -105,7 +94,7 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
     };
   }, []);
 
-  // Efeito adicional: garante que nunca fique vazio após renderizações
+  // Garante que nunca fique vazio após renderizações
   useEffect(() => {
     if (products.length === 0 && !loading) {
       setProducts(defaultProducts);
@@ -124,15 +113,18 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
     [products, search, category]
   );
 
-  // Handler para busca
-  const handleSearchChange = (e) => {
-    // Atualiza o estado local de busca
-  };
-
-  // Handler para mudança de categoria
-  const handleCategoryChange = (e) => {
-    // Atualiza o estado local de categoria
-  };
+  // Função querenderiza um ProductCard
+  function renderProduct(product, index) {
+    return (
+      <ProductCard
+        key={product.id}
+        product={product}
+        isFavorite={favorites.includes(product.id)}
+        onToggleFavorite={onToggleFavorite}
+        onAddToCart={() => add(product)}
+      />
+    );
+  }
 
   return (
     <section className="section">
@@ -147,10 +139,10 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
       <div className="toolbar">
         <input
           placeholder="Buscar por nome..."
-          onChange={handleSearchChange}
+          onChange={() => {}}
           aria-label="Buscar produtos"
         />
-        <select onChange={handleCategoryChange} aria-label="Filtrar categoria">
+        <select aria-label="Filtrar categoria">
           <option value="">Todas as categorias</option>
           {categories.map((item) => (
             <option key={item} value={item}>
@@ -161,32 +153,23 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
       </div>
       {loading && <div className="status">Carregando produtos...</div>}
       {error && <div className="status status--error">{error}</div>}
-      {/* Grid de produtos - só.renderiza se houver produtos */}
+      {/* Grid de produtos - só.renderiza se houver produtos da API */}
       {products.length > 0 && (
         <div className="product-grid">
-          {filtered.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              isFavorite={favorites.includes(product.id)}
-              onToggleFavorite={onToggleFavorite}
-              onAddToCart={() => add(product)}
-            />
-          ))}
+          {/* Renderiza os produtos usando função auxiliar */}
+          {[...products].map(renderProduct)}
         </div>
       )}
-      {/* Fallback: mostra produtos padrão se não houver produtos da API */}
+      {/* Fallback: mostra os 5 produtos padrão */}
       {products.length === 0 && !loading && (
         <div className="product-grid">
-          {defaultProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              isFavorite={favorites.includes(product.id)}
-              onToggleFavorite={onToggleFavorite}
-              onAddToCart={() => add(product)}
-            />
-          )}
+          {[
+            defaultProducts[0],
+            defaultProducts[1],
+            defaultProducts[2],
+            defaultProducts[3],
+            defaultProducts[4]
+          ].map(renderProduct)}
         </div>
       )}
       {/* Mensagem quando não há o que mostrar (apenas se carregando e sem fallback) */}
