@@ -4,7 +4,7 @@ import { getProducts } from '../services/api';
 import { filterProducts } from '../utils/catalog';
 import { useCart } from '../context/CartContext';
 
-// Produtos padrão para garantir que o catálogo nunca fique vazio
+// Produtos padrão garantidos - nunca o catálogo ficará vazio
 const defaultProducts = [
   {
     id: 1,
@@ -57,25 +57,17 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showFallback, setShowFallback] = useState(false);
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
-  const { add } = useCart();
 
   useEffect(() => {
     let active = true;
     getProducts()
       .then((data) => {
-        if (active) {
-          // Se trouxe produtos do backend, usa eles
-          // Se vier vazio ou array curto, usa fallback
-          if (data && data.length > 0) {
-            setProducts(data);
-          } else {
-            // Banco retornou vazio, usa produtos padrão
-            setProducts(defaultProducts);
-            setShowFallback(true);
-          }
+        if (active && data && data.length > 0) {
+          // Se backend trouxe produtos reais, usa eles
+          setProducts(data);
+        } else {
+          // Backend vazia ou erro, usa produtos padrão
+          setProducts(defaultProducts);
         }
       })
       .catch((err) => {
@@ -83,7 +75,6 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
           console.error('Erro ao carregar produtos:', err);
           // Em caso de erro, usa produtos fallback
           setProducts(defaultProducts);
-          setShowFallback(true);
         }
       })
       .finally(() => {
@@ -94,13 +85,12 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
     };
   }, []);
 
-  // Se não houver produtos ainda (ex: efeito race condition), usa fallback
+  // Garante que nunca fique vazio - se products ainda estiver vazio após o efeito
   useEffect(() => {
-    if (products.length === 0 && !error) {
+    if (products.length === 0 && !loading) {
       setProducts(defaultProducts);
-      setShowFallback(true);
     }
-  }, [products.length]);
+  }, [products.length, loading]);
 
   const categories = useMemo(
     () => [...new Set(products.map((p) => p.category))],
@@ -142,23 +132,10 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
         </select>
       </div>
       {loading && <div className="status">Carregando produtos...</div>}
-      {error && !showFallback && <div className="status status--error">{error}</div>}
-      {/* Mostra fallback se: já tentou carregar e ( veio vazio ou houve erro ) */}
-      {showFallback && !loading && <div className="status status--info">Produtos carregados do sistema</div>}
-      {!loading && !error && !showFallback && <div className="product-grid">
-        {filtered.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            isFavorite={favorites.includes(product.id)}
-            onToggleFavorite={onToggleFavorite}
-            onAddToCart={() => add(product)}
-          />
-        ))}
-      </div>}
-      {showFallback && !loading && (
+      {error && <div className="status status--error">{error}</div>}
+      {!loading && !error &&
         <div className="product-grid">
-          {defaultProducts.map((product) => (
+          {filtered.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
@@ -167,9 +144,8 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
               onAddToCart={() => add(product)}
             />
           ))}
-        </div>
-      )}
-      {!loading && !error && !showFallback && filtered.length === 0 && (
+        </div>}
+      {filtered.length === 0 && (
         <div className="status">Nenhum produto encontrado.</div>
       )}
     </section>
