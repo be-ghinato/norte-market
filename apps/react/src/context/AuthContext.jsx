@@ -1,11 +1,13 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import * as api from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     let active = true;
@@ -37,13 +39,18 @@ export function AuthProvider({ children }) {
 
   async function handleLogin(values) {
     const data = await api.login(values);
+    if (data.token) {
+      localStorage.setItem('nm_token', data.token);
+    }
     setUser(data.user);
+    navigate('/catalogo');
     return data;
   }
 
   function handleLogout() {
     api.logout();
     setUser(null);
+    navigate('/login');
   }
 
   const value = { user, loading, register: handleRegister, login: handleLogin, logout: handleLogout };
