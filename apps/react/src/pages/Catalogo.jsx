@@ -57,6 +57,9 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  // Adicionei useState para search e category
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -114,7 +117,7 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
   );
 
   // Função querenderiza um ProductCard
-  function renderProduct(product, index) {
+  function renderProduct(product) {
     return (
       <ProductCard
         key={product.id}
@@ -156,20 +159,13 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
       {/* Grid de produtos - só.renderiza se houver produtos da API */}
       {products.length > 0 && (
         <div className="product-grid">
-          {/* Renderiza os produtos usando função auxiliar */}
-          {[...products].map(renderProduct)}
+          {filtered.map(renderProduct)}
         </div>
       )}
       {/* Fallback: mostra os 5 produtos padrão */}
       {products.length === 0 && !loading && (
         <div className="product-grid">
-          {[
-            defaultProducts[0],
-            defaultProducts[1],
-            defaultProducts[2],
-            defaultProducts[3],
-            defaultProducts[4]
-          ].map(renderProduct)}
+          {[defaultProducts[0], defaultProducts[1], defaultProducts[2], defaultProducts[3], defaultProducts[4]].map(renderProduct)}
         </div>
       )}
       {/* Mensagem quando não há o que mostrar (apenas se carregando e sem fallback) */}
