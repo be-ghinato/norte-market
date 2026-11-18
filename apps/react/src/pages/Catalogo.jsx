@@ -69,6 +69,11 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
   const [newProduct, setNewProduct] = useState({ name: '', price: '', category: '', stock: '' });
   const [creating, setCreating] = useState(false);
 
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editProduct, setEditProduct] = useState(null);
+  const [editing, setEditing] = useState(false);
+
   async function handleCreateProduct(event) {
     event.preventDefault();
     setCreating(true);
@@ -90,9 +95,31 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
     }
   }
 
-  async function handleEdit(product) {
-    // TODO: Implement edit modal/form
-    alert(`Editar produto: ${product.title}`);
+  function openEditModal(product) {
+    setEditProduct(product);
+    setShowEditModal(true);
+  }
+
+  async function handleEditProduct(event) {
+    event.preventDefault();
+    if (!editProduct) return;
+    setEditing(true);
+    try {
+      const productData = {
+        name: editProduct.name,
+        price: Number(editProduct.price),
+        category: editProduct.category,
+        stock: Number(editProduct.stock) || 0
+      };
+      const updated = await updateProduct(editProduct.id, productData);
+      setProducts(prev => prev.map(p => p.id === editProduct.id ? updated : p));
+      setShowEditModal(false);
+      setEditProduct(null);
+    } catch (err) {
+      alert('Erro ao atualizar produto: ' + (err?.response?.data?.message || err.message));
+    } finally {
+      setEditing(false);
+    }
   }
 
   async function handleDelete(id) {
@@ -170,7 +197,7 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
         onToggleFavorite={onToggleFavorite}
         onAddToCart={() => add(product)}
         isAdmin={isAdmin}
-        onEdit={handleEdit}
+        onEdit={openEditModal}
         onDelete={handleDelete}
       />
     );
@@ -280,6 +307,65 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
                 </button>
                 <button type="submit" className="button button--light" disabled={creating}>
                   {creating ? 'Criando...' : 'Criar Produto'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && editProduct && (
+        <div className="modal-overlay" onClick={() => { setShowEditModal(false); setEditProduct(null); }}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3>Editar Produto</h3>
+            <form onSubmit={handleEditProduct} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div className="field">
+                <label>Nome</label>
+                <input
+                  required
+                  type="text"
+                  value={editProduct.name}
+                  onChange={(e) => setEditProduct({ ...editProduct, name: e.target.value })}
+                  placeholder="Nome do produto"
+                />
+              </div>
+              <div className="field">
+                <label>Preço</label>
+                <input
+                  required
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={editProduct.price}
+                  onChange={(e) => setEditProduct({ ...editProduct, price: e.target.value })}
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="field">
+                <label>Categoria</label>
+                <input
+                  type="text"
+                  value={editProduct.category}
+                  onChange={(e) => setEditProduct({ ...editProduct, category: e.target.value })}
+                  placeholder="Ex: eletronicos, moveis"
+                />
+              </div>
+              <div className="field">
+                <label>Estoque</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={editProduct.stock}
+                  onChange={(e) => setEditProduct({ ...editProduct, stock: e.target.value })}
+                  placeholder="0"
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flexEnd', marginTop: '8px' }}>
+                <button type="button" className="button button--ghost" onClick={() => { setShowEditModal(false); setEditProduct(null); }}>
+                  Cancelar
+                </button>
+                <button type="submit" className="button button--light" disabled={editing}>
+                  {editing ? 'Salvando...' : 'Salvar Alterações'}
                 </button>
               </div>
             </form>

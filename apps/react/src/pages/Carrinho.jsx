@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { formatPrice } from '../utils/catalog';
 
 export default function Carrinho() {
   const { items, changeQty, remove, clear, total } = useCart();
+  const navigate = useNavigate();
   const [checkoutError, setCheckoutError] = useState('');
 
   if (items.length === 0) {
@@ -63,9 +64,9 @@ export default function Carrinho() {
           <strong>{formatPrice(total)}</strong>
         </div>
         {checkoutError && <div className="status status--error">{checkoutError}</div>}
-        <button className="button button--light button--full" onClick={() => setCheckoutError('')}>
+        <Link to="/checkout" className="button button--light button--full" onClick={() => setCheckoutError('')}>
           Finalizar compra
-        </button>
+        </Link>
         <button
           className="button button--ghost button--full"
           onClick={() => {
