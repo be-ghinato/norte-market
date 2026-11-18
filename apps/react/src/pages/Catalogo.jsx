@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import ProductCard from '../components/ProductCard';
-import { getProducts } from '../services/api';
+import { getProducts, updateProduct, deleteProduct, createProduct } from '../services/api';
 import { filterProducts } from '../utils/catalog';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 // 5 produtos padrão garantidos - nunca o catálogo ficará vazio
 const defaultProducts = [
@@ -60,6 +61,49 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
   // Adicionei useState para search e category
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
+  const { add } = useCart();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newProduct, setNewProduct] = useState({ name: '', price: '', category: '', stock: '' });
+  const [creating, setCreating] = useState(false);
+
+  async function handleCreateProduct(event) {
+    event.preventDefault();
+    setCreating(true);
+    try {
+      const productData = {
+        name: newProduct.name,
+        price: Number(newProduct.price),
+        category: newProduct.category,
+        stock: Number(newProduct.stock) || 0
+      };
+      const created = await createProduct(productData);
+      setProducts(prev => [created, ...prev]);
+      setShowCreateModal(false);
+      setNewProduct({ name: '', price: '', category: '', stock: '' });
+    } catch (err) {
+      alert('Erro ao criar produto: ' + (err?.response?.data?.message || err.message));
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  async function handleEdit(product) {
+    // TODO: Implement edit modal/form
+    alert(`Editar produto: ${product.title}`);
+  }
+
+  async function handleDelete(id) {
+    if (!window.confirm('Tem certeza que deseja excluir este produto?')) return;
+    try {
+      await deleteProduct(id);
+      setProducts(prev => prev.filter(p => p.id !== id));
+    } catch (err) {
+      alert('Erro ao excluir produto');
+    }
+  }
 
   useEffect(() => {
     let active = true;
@@ -116,7 +160,7 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
     [products, search, category]
   );
 
-  // Função querenderiza um ProductCard
+  // Função para renderizar um ProductCard
   function renderProduct(product) {
     return (
       <ProductCard
@@ -125,6 +169,9 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
         isFavorite={favorites.includes(product.id)}
         onToggleFavorite={onToggleFavorite}
         onAddToCart={() => add(product)}
+        isAdmin={isAdmin}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
     );
   }
@@ -139,13 +186,21 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
           encontrar o que procura.
         </p>
       </div>
+      {isAdmin && (
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+          <button className="button button--light" onClick={() => setShowCreateModal(true)}>
+            + Novo Produto
+          </button>
+        </div>
+      )}
       <div className="toolbar">
         <input
           placeholder="Buscar por nome..."
-          onChange={() => {}}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           aria-label="Buscar produtos"
         />
-        <select aria-label="Filtrar categoria">
+        <select value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Filtrar categoria">
           <option value="">Todas as categorias</option>
           {categories.map((item) => (
             <option key={item} value={item}>
@@ -171,6 +226,65 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
       {/* Mensagem quando não há o que mostrar (apenas se carregando e sem fallback) */}
       {loading && filtered.length === 0 && (
         <div className="status">Carregando produtos...</div>
+      )}
+
+      {showCreateModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3>Criar Novo Produto</h3>
+            <form onSubmit={handleCreateProduct} style="display: flex; flex-direction: column; gap: 12px;">
+              <div className="field">
+                <label>Nome</label>
+                <input
+                  required
+                  type="text"
+                  value={newProduct.name}
+                  onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                  placeholder="Nome do produto"
+                />
+              </div>
+              <div className="field">
+                <label>Preço</label>
+                <input
+                  required
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={newProduct.price}
+                  onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="field">
+                <label>Categoria</label>
+                <input
+                  type="text"
+                  value={newProduct.category}
+                  onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+                  placeholder="Ex: eletronicos, moveis"
+                />
+              </div>
+              <div className="field">
+                <label>Estoque</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={newProduct.stock}
+                  onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })}
+                  placeholder="0"
+                />
+              </div>
+              <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px;">
+                <button type="button" className="button button--ghost" onClick={() => setShowCreateModal(false)}>
+                  Cancelar
+                </button>
+                <button type="submit" className="button button--light" disabled={creating}>
+                  {creating ? 'Criando...' : 'Criar Produto'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </section>
   );

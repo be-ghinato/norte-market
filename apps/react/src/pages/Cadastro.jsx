@@ -28,7 +28,8 @@ export default function Cadastro() {
         <h2>Cadastre-se</h2>
         <p>Crie sua conta para acompanhar seus pedidos e salvar favoritos.</p>
       </div>
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <div className="auth-card">
+        <form className="auth-form" onSubmit={handleSubmit}>
         {error && <div className="status status--error">{error}</div>}
         <div className="field">
           <label>Nome completo</label>
@@ -62,6 +63,7 @@ export default function Cadastro() {
           {loading ? 'Cadastrando...' : 'Cadastrar'}
         </button>
       </form>
+      </div>
       <p className="auth-link">
         Já tem uma conta?{' '}
         <Link to="/login" className="button button--ghost">

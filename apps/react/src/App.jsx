@@ -11,6 +11,7 @@ import Cadastro from './pages/Cadastro';
 import Carrinho from './pages/Carrinho';
 import Checkout from './pages/Checkout';
 import MeusPedidos from './pages/MeusPedidos';
+import Perfil from './pages/Perfil';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 
@@ -34,6 +35,7 @@ export default function App() {
               <Route path="/carrinho" element={<Carrinho />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/pedidos" element={<MeusPedidos />} />
+              <Route path="/perfil" element={<Perfil />} />
               <Route
                 path="/catalogo"
                 element={<Catalogo favorites={favorites} onToggleFavorite={toggleFavorite} />}

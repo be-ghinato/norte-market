@@ -19,7 +19,10 @@ export default function Header() {
       <NavLink to="/pedidos" className={({ isActive }) => (isActive ? 'nav__link nav__link--active' : 'nav__link')}>
         Meus pedidos
       </NavLink>
-      <button className="nav__link" onClick={handleLogout}>Sair ({user.name})</button>
+      <NavLink to="/perfil" className={({ isActive }) => (isActive ? 'nav__link nav__link--active' : 'nav__link')}>
+        {user.name}
+      </NavLink>
+      <button className="nav__link nav__link--logout" onClick={handleLogout}>Sair</button>
     </>
   ) : (
     <>

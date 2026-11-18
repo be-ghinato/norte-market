@@ -26,7 +26,8 @@ export default function Login() {
         <h2>Bem-vindo de volta</h2>
         <p>Faça login para acessar seus pedidos e finalizar compras.</p>
       </div>
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <div className="auth-card">
+        <form className="auth-form" onSubmit={handleSubmit}>
         {error && <div className="status status--error">{error}</div>}
         <div className="field">
           <label>E-mail</label>
@@ -50,6 +51,7 @@ export default function Login() {
           {loading ? 'Entrando...' : 'Entrar'}
         </button>
       </form>
+      </div>
       <p className="auth-link">
         Não tem uma conta?{' '}
         <Link to="/cadastro" className="button button--ghost">

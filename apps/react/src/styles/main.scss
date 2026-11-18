@@ -16,7 +16,7 @@ a { color: inherit; }
   &__mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 9px; background: $navy; color: #0c0c0d; font-size: 10px; font-weight: 800; letter-spacing: .08em; }
   strong, small { display: block; } strong { font-size: 14px; } small { margin-top: 2px; color: $muted; font-size: 10px; }
 }
-.nav { display: flex; gap: 4px; &__link { padding: 7px 10px; border-radius: 7px; color: $muted; text-decoration: none; font-size: 12px; transition: color .2s, background .2s; &:hover, &--active { color: $ink; background: #1e1e22; } } &--cart { position: relative; } &__badge { position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: $gold; color: #0c0c0d; border-radius: 50%; font-size: 8px; font-weight: 800; display: grid; place-items: center; } &--ghost { color: $ink; } .nav__loading { font-size: 11px; color: $muted; } }
+.nav { display: flex; gap: 4px; &__link { padding: 7px 10px; border-radius: 7px; color: $muted; text-decoration: none; font-size: 12px; transition: color .2s, background .2s; &:hover, &--active { color: $ink; background: #1e1e22; } } &--cart { position: relative; } &__badge { position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: $gold; color: #0c0c0d; border-radius: 50%; font-size: 8px; font-weight: 800; display: grid; place-items: center; } &--ghost { color: $ink; } &--logout { background: transparent; color: $danger; border: 1px solid $danger; &:hover { background: rgba($danger, .1); } } .nav__loading { font-size: 11px; color: $muted; } }
 .footer { @include container; border-top: 1px solid $line; padding: 18px 0 25px; display: flex; flex-direction: column; gap: 4px; color: $muted; font-size: 10px; }
 
 .hero { display: grid; gap: 22px; padding: 28px; background: linear-gradient(145deg, #17171a, #101012); border: 1px solid $line; color: $ink; border-radius: $radius; box-shadow: $shadow;
@@ -63,11 +63,33 @@ a { color: inherit; }
   .product-card__image { height: 230px; }
 }
 
-.auth-form { display: grid; gap: 12px; max-width: 420px; margin: 0 auto; }
-.field { display: flex; flex-direction: column; gap: 5px; }
+.auth-form { display: grid; gap: 16px; max-width: 420px; margin: 0 auto; }
+.field { display: flex; flex-direction: column; gap: 6px; }
 .field label { font-size: 11px; font-weight: 700; color: $muted; text-transform: uppercase; letter-spacing: .06em; }
-.auth-link { margin-top: 14px; text-align: center; font-size: 12px; color: $muted; }
+.field input { 
+  min-height: 46px; 
+  padding: 12px 14px; 
+  border: 1px solid $line; 
+  border-radius: 8px; 
+  background: #1a1a1e; 
+  color: $ink; 
+  font-size: 14px;
+  transition: border-color .2s, box-shadow .2s;
+  &:focus { 
+    @include focus-ring; 
+    border-color: $navy; 
+  }
+  &::placeholder { color: $muted; }
+}
+.auth-link { margin-top: 8px; text-align: center; font-size: 12px; color: $muted; }
 .auth-link .button--ghost { font-size: 12px; }
+.auth-card {
+  background: $surface;
+  border: 1px solid $line;
+  border-radius: $radius;
+  padding: 32px;
+  box-shadow: $shadow;
+}
 
 .cart-list { display: grid; gap: 10px; margin-bottom: 18px; }
 .cart-row { display: grid; grid-template-columns: 70px 1fr auto 80px; gap: 12px; align-items: center; padding: 12px; background: $surface; border: 1px solid $line; border-radius: $radius; }
@@ -94,3 +116,24 @@ a { color: inherit; }
 .badge--enviado { background: rgba(99, 154, 227, 0.15); color: #639ae3; border: 1px solid rgba(99, 154, 227, 0.35); }
 .badge--entregue { background: rgba(143, 143, 151, 0.15); color: #8f8f97; border: 1px solid rgba(143, 143, 151, 0.35); }
 .badge--cancelado { background: rgba(224, 93, 93, 0.12); color: #e05d5d; border: 1px solid rgba(224, 93, 93, 0.25); }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.modal {
+  background: $surface;
+  border: 1px solid $line;
+  border-radius: $radius;
+  padding: 24px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: $shadow;
+  h3 { margin: 0 0 16px; font-size: 18px; }
+}
