@@ -81,15 +81,15 @@ export default function Perfil() {
         </div>
         <div className="info-card">
           <h3>Ações</h3>
-          <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <Link to="/catalogo" className="button button--light">Continuar comprando</Link>
             <Link to="/favoritos" className="button button--ghost">Ver favoritos</Link>
-            <button className="button button--dark" onClick={handleLogout} style="margin-top: 8px;">Sair da conta</button>
+            <button className="button button--dark" onClick={handleLogout} style={{ marginTop: '8px' }}>Sair da conta</button>
           </div>
         </div>
       </div>
 
-      <div className="section__head" style="margin-top: 40px;">
+      <div className="section__head" style={{ marginTop: '40px' }}>
         <span className="section__eyebrow">Meus Pedidos</span>
         <h2>Histórico de compras</h2>
         <p>Acompanhe o status das suas compras recentes.</p>

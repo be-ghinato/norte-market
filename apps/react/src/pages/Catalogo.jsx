@@ -187,7 +187,7 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
         </p>
       </div>
       {isAdmin && (
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+        <div style={{ display: 'flex', justifyContent: 'flexEnd', marginBottom: '16px' }}>
           <button className="button button--light" onClick={() => setShowCreateModal(true)}>
             + Novo Produto
           </button>
@@ -232,7 +232,7 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
         <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <h3>Criar Novo Produto</h3>
-            <form onSubmit={handleCreateProduct} style="display: flex; flex-direction: column; gap: 12px;">
+            <form onSubmit={handleCreateProduct} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div className="field">
                 <label>Nome</label>
                 <input
@@ -274,7 +274,7 @@ export default function Catalogo({ favorites, onToggleFavorite }) {
                   placeholder="0"
                 />
               </div>
-              <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px;">
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flexEnd', marginTop: '8px' }}>
                 <button type="button" className="button button--ghost" onClick={() => setShowCreateModal(false)}>
                   Cancelar
                 </button>
